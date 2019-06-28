@@ -55,3 +55,5 @@ class Open62541Conan(ConanFile):
         if self.settings.os == "Windows":
             self.cpp_info.libs.append("ws2_32")
         self.cpp_info.defines.append("UA_NO_AMALGAMATION")
+        if self.options.shared and self.settings.os == "Windows":
+            self.cpp_info.bindirs.append(self.package_folder)
