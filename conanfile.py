@@ -4,45 +4,34 @@ from conans import ConanFile, CMake, tools
 import os
 
 
-class LibnameConan(ConanFile):
-    name = "libname"
-    version = "0.0.0"
-    description = "Keep it short"
-    # topics can get used for searches, GitHub topics, Bintray tags etc. Add here keywords about the library
-    topics = ("conan", "libname", "logging")
-    url = "https://github.com/bincrafters/conan-libname"
-    homepage = "https://github.com/original_author/original_lib"
+class Open62541Conan(ConanFile):
+    name = "open62541"
+    version = "0.3.0"
+    description = "open62541 (http://open62541.org) is an open source and free implementation of OPC UA " \
+                  "(OPC Unified Architecture) written in the common subset of the C99 and C++98 languages"
+    topics = ("conan", "open62541", "opcua", "iec62541")
+    url = "https://github.com/bincrafters/conan-open62541"
+    homepage = "https://github.com/open62541/open62541"
     author = "Bincrafters <bincrafters@gmail.com>"
-    license = "MIT"  # Indicates license type of the packaged library; please use SPDX Identifiers https://spdx.org/licenses/
-    exports = ["LICENSE.md"]      # Packages the license for the conanfile.py
-    # Remove following lines if the target lib does not use cmake.
+    license = "	MPL-2.0"
+    exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
     generators = "cmake"
-
-    # Options may need to change depending on the packaged library.
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
-
-    # Custom attributes for Bincrafters recipe conventions
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
-
-    requires = (
-        "OpenSSL/1.0.2s@conan/stable",
-        "zlib/1.2.11@conan/stable"
-    )
 
     def config_options(self):
         if self.settings.os == 'Windows':
             del self.options.fPIC
 
     def source(self):
-        source_url = "https://github.com/libauthor/libname"
-        tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version), sha256="Please-provide-a-checksum")
+        source_url = "https://github.com/open62541/open62541"
+        tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version),
+                  sha256="114fead5ca83a3bf47241f68cad0a1a4f815538584a3ee9fe2c00ebf2bd85c19")
         extracted_dir = self.name + "-" + self.version
-
-        # Rename to "source_subfolder" is a convention to simplify later steps
         os.rename(extracted_dir, self._source_subfolder)
 
     def _configure_cmake(self):
@@ -52,6 +41,7 @@ class LibnameConan(ConanFile):
         return cmake
 
     def build(self):
+        tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"), "-Werror", "")
         cmake = self._configure_cmake()
         cmake.build()
 
@@ -59,15 +49,9 @@ class LibnameConan(ConanFile):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         cmake = self._configure_cmake()
         cmake.install()
-        # If the CMakeLists.txt has a proper install method, the steps below may be redundant
-        # If so, you can just remove the lines below
-        include_folder = os.path.join(self._source_subfolder, "include")
-        self.copy(pattern="*", dst="include", src=include_folder)
-        self.copy(pattern="*.dll", dst="bin", keep_path=False)
-        self.copy(pattern="*.lib", dst="lib", keep_path=False)
-        self.copy(pattern="*.a", dst="lib", keep_path=False)
-        self.copy(pattern="*.so*", dst="lib", keep_path=False)
-        self.copy(pattern="*.dylib", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.libs = ["open62541"]
+        if self.settings.os == "Windows":
+            self.cpp_info.libs.append("ws2_32")
+        self.cpp_info.defines.append("UA_NO_AMALGAMATION")
