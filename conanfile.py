@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from conans import ConanFile, CMake, tools
 import os
 
@@ -12,7 +10,6 @@ class Open62541Conan(ConanFile):
     topics = ("conan", "open62541", "opcua", "iec62541")
     url = "https://github.com/bincrafters/conan-open62541"
     homepage = "https://github.com/open62541/open62541"
-    author = "Bincrafters <bincrafters@gmail.com>"
     license = "	MPL-2.0"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
