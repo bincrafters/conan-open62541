@@ -11,7 +11,6 @@ class Open62541Conan(ConanFile):
     url = "https://github.com/bincrafters/conan-open62541"
     homepage = "https://github.com/open62541/open62541"
     license = "	MPL-2.0"
-    exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
